@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { Chat } from '@ai-sdk/svelte';
 	import { invalidateAll } from '$app/navigation';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import { Input } from '$lib/components/ui/input';
@@ -7,6 +8,8 @@
 	import { UploadButton } from '@uploadthing/svelte';
 
 	let { data } = $props();
+
+	const chat = new Chat();
 
 	let { files } = $derived(data);
 
@@ -64,3 +67,21 @@
 		{/each}
 	</Table.Body>
 </Table.Root>
+<ul>
+	{#each chat.messages as message, messageIndex (messageIndex)}
+		<li>
+			<div>{message.role}</div>
+			<div>
+				{#each message.parts as part, partIndex (partIndex)}
+					{#if part.type === 'text'}
+						<div>{part.text}</div>
+					{/if}
+				{/each}
+			</div>
+		</li>
+	{/each}
+</ul>
+<form class="mt-4 flex gap-2" onsubmit={chat.handleSubmit}>
+	<Input bind:value={chat.input} />
+	<Button type="submit">Send</Button>
+</form>

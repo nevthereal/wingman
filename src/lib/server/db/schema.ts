@@ -5,7 +5,10 @@ export const files = p.pgTable('files', {
 	url: p.text('url').notNull(),
 	name: p.text('name').notNull(),
 	type: p.text('type').notNull(),
-	projectId: p.uuid('projectId').notNull()
+	projectId: p
+		.uuid('projectId')
+		.notNull()
+		.references(() => project.id)
 });
 
 export const project = p.pgTable('project', {

@@ -2,6 +2,12 @@ import { createUploadthing } from 'uploadthing/server';
 import type { FileRouter } from 'uploadthing/server';
 import { db } from './db';
 import { files } from './db/schema';
+import { UTApi } from 'uploadthing/server';
+import { UPLOADTHING_TOKEN } from '$env/static/private';
+
+export const utapi = new UTApi({
+	token: UPLOADTHING_TOKEN
+});
 
 const f = createUploadthing();
 
@@ -36,6 +42,7 @@ export const ourFileRouter = {
 				name: file.name,
 				type: file.type,
 				url: file.ufsUrl,
+				key: file.key,
 				projectId: metadata.project
 			});
 		})

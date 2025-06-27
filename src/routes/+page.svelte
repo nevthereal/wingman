@@ -2,8 +2,9 @@
 	import { invalidateAll } from '$app/navigation';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import { Input } from '$lib/components/ui/input';
-	import { createUploadThing } from '$lib/utils';
+	import { cn, createUploader } from '$lib/utils';
 	import * as Table from '$lib/components/ui/table';
+	import { UploadButton } from '@uploadthing/svelte';
 
 	let { data } = $props();
 
@@ -12,7 +13,7 @@
 	let uploads = $state<File[]>();
 	$inspect(uploads);
 
-	const { startUpload, isUploading } = createUploadThing('imageUploader', {
+	const uploader = createUploader('imageUploader', {
 		onClientUploadComplete: (res) => {
 			console.log(res);
 			invalidateAll();
@@ -20,7 +21,20 @@
 	});
 </script>
 
-<Input
+<UploadButton
+	{uploader}
+	class="ut-uploading:cursor-not-allowed ut-button:bg-primary ut-button:ut-readying:bg-primary/50 mt-4"
+>
+	<span slot="button-content" let:state>
+		{state.isUploading ? 'Uploading...' : 'Pick a file'}
+	</span>
+	<span slot="clear-btn" let:state> Clear files </span>
+	<span slot="allowed-content" let:state>
+		You can choose between {state.fileTypes.join(', ')} files
+	</span>
+</UploadButton>
+
+<!-- <Input
 	disabled={$isUploading}
 	type="file"
 	multiple
@@ -30,9 +44,9 @@
 		// Convert FileList to File[] and start the upload
 		await startUpload(Array.from(files));
 	}}
-/>
+/> -->
 <Table.Root>
-	<Table.Caption>A list of your recent invoices.</Table.Caption>
+	<Table.Caption>Your knowledge base.</Table.Caption>
 	<Table.Header>
 		<Table.Row>
 			<Table.Head class="w-[100px]">Name</Table.Head>
@@ -44,7 +58,7 @@
 		{#each files as file}
 			<Table.Row>
 				<Table.Cell class="font-medium">{file.name}</Table.Cell>
-				<Table.Cell>{file.url}</Table.Cell>
+				<Table.Cell>{file.type}</Table.Cell>
 				<Table.Cell class="text-right"><Button variant="destructive">Delete</Button></Table.Cell>
 			</Table.Row>
 		{/each}

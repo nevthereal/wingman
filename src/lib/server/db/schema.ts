@@ -8,7 +8,8 @@ export const files = p.pgTable('files', {
 	projectId: p
 		.uuid('projectId')
 		.notNull()
-		.references(() => project.id)
+		.references(() => project.id),
+	key: p.text('key').notNull()
 });
 
 export const project = p.pgTable('project', {

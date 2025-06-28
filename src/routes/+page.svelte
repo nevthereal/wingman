@@ -6,12 +6,25 @@
 	import { cn, createUploader } from '$lib/utils';
 	import * as Table from '$lib/components/ui/table';
 	import { UploadButton } from '@uploadthing/svelte';
+	import { parseAstAsync } from 'vite';
 
 	let { data } = $props();
-
-	const chat = new Chat();
-
 	let { files } = $derived(data);
+
+	const chat = new Chat({
+		initialMessages: [
+			{
+				role: 'data',
+				experimental_attachments: files.map((file) => ({
+					url: file.url,
+					contentType: file.type,
+					name: file.name
+				})),
+				content: 'The files of the knowledge base',
+				id: 'knowledge-base'
+			}
+		]
+	});
 
 	let uploads = $state<File[]>();
 	$inspect(uploads);
@@ -69,7 +82,7 @@
 </Table.Root>
 <ul>
 	{#each chat.messages as message, messageIndex (messageIndex)}
-		<li>
+		<li class={message.role === 'data' ? 'hidden' : ''}>
 			<div>{message.role}</div>
 			<div>
 				{#each message.parts as part, partIndex (partIndex)}

@@ -6,30 +6,28 @@
 	import { cn, createUploader } from '$lib/utils';
 	import * as Table from '$lib/components/ui/table';
 	import { UploadButton } from '@uploadthing/svelte';
-	import { parseAstAsync } from 'vite';
 
 	let { data } = $props();
 	let { files } = $derived(data);
 
-	const chat = new Chat({
-		initialMessages: [
-			{
-				role: 'data',
-				experimental_attachments: files.map((file) => ({
-					url: file.url,
-					contentType: file.type,
-					name: file.name
-				})),
-				content: 'The files of the knowledge base',
-				id: 'knowledge-base'
-			}
-		]
-	});
+	const chat = $derived(
+		new Chat({
+			initialMessages: [
+				{
+					role: 'user',
+					experimental_attachments: files.map((file) => ({
+						url: file.url,
+						contentType: file.type,
+						name: file.name
+					})),
+					content: 'The files of the knowledge base',
+					id: 'knowledge-base'
+				}
+			]
+		})
+	);
 
-	let uploads = $state<File[]>();
-	$inspect(uploads);
-
-	const uploader = createUploader('imageUploader', {
+	const uploader = createUploader('uploader', {
 		onClientUploadComplete: (res) => {
 			console.log(res);
 			invalidateAll();
@@ -50,17 +48,6 @@
 	</span>
 </UploadButton>
 
-<!-- <Input
-	disabled={$isUploading}
-	type="file"
-	multiple
-	onchange={async (e) => {
-		const files = e.currentTarget.files;
-		if (!files || files.length === 0) return;
-		// Convert FileList to File[] and start the upload
-		await startUpload(Array.from(files));
-	}}
-/> -->
 <Table.Root>
 	<Table.Caption>Your knowledge base.</Table.Caption>
 	<Table.Header>
@@ -73,7 +60,9 @@
 	<Table.Body>
 		{#each files as file}
 			<Table.Row>
-				<Table.Cell class="font-medium">{file.name}</Table.Cell>
+				<Table.Cell class="font-medium"
+					><a href={file.url} target="_blank">{file.name}</a></Table.Cell
+				>
 				<Table.Cell>{file.type}</Table.Cell>
 				<Table.Cell class="text-right"><Button variant="destructive">Delete</Button></Table.Cell>
 			</Table.Row>
@@ -82,7 +71,7 @@
 </Table.Root>
 <ul>
 	{#each chat.messages as message, messageIndex (messageIndex)}
-		<li class={message.role === 'data' ? 'hidden' : ''}>
+		<li class={[message.role === 'data' && 'hidden']}>
 			<div>{message.role}</div>
 			<div>
 				{#each message.parts as part, partIndex (partIndex)}

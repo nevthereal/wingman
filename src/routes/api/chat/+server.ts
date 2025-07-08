@@ -12,7 +12,9 @@ export async function POST({ request }) {
 
 	const result = streamText({
 		model: openai('gpt-4o'),
-		messages
+		messages,
+		system:
+			'You are a chat platform to answer questions about the knowledge base. If possible, answer the questions using the knowledge base. If you do not have an answer, say so.'
 	});
 
 	return result.toDataStreamResponse();

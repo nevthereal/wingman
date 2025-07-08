@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { marked } from 'marked';
 	import { Chat } from '@ai-sdk/svelte';
 	import { invalidateAll } from '$app/navigation';
 	import Button from '$lib/components/ui/button/button.svelte';
@@ -71,12 +72,12 @@
 </Table.Root>
 <ul>
 	{#each chat.messages as message, messageIndex (messageIndex)}
-		<li class={[message.role === 'data' && 'hidden']}>
+		<li class={[message.id === 'knowledge-base' && 'hidden']}>
 			<div>{message.role}</div>
 			<div>
 				{#each message.parts as part, partIndex (partIndex)}
 					{#if part.type === 'text'}
-						<div>{part.text}</div>
+						<div class="prose">{@html marked(part.text)}</div>
 					{/if}
 				{/each}
 			</div>
